@@ -26,7 +26,6 @@
         .progress-bar-inner {
             transition: width 0.8s cubic-bezier(0.25, 0.1, 0.25, 1), background-color 0.8s ease;
         }
-        /* -- 新增和修改的动画 -- */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
@@ -103,7 +102,7 @@
         </div>
     </div>
 
-    <!-- 增加了 container-fade-in class 来实现进入动画 -->
+    <!-- container-fade-in class 实现进入动画 -->
     <div class="w-full max-w-md mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 space-y-6 container-fade-in">
         <!-- Header -->
         <div class="text-center">
@@ -115,7 +114,7 @@
         <!-- Input Form -->
         <div class="space-y-4">
             <input type="text" id="nameInput" placeholder="输入任何名字或网名" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300">
-            <!-- 增加了 active:scale-95 来实现按钮按压效果 -->
+            <!-- active:scale-95 实现按钮按压效果 -->
             <button id="calculateBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 active:scale-95 shadow-lg">
                 <span id="btnText">开始计算</span>
                 <span id="btnSpinner" class="hidden animate-spin">◐</span>
@@ -153,11 +152,11 @@
             const progressBar = document.getElementById('progressBar');
             const percentageText = document.getElementById('percentageText');
             const resultMessage = document.getElementById('resultMessage');
-            const shareButton = document.getElementById('shareButton'); // 新增
-            const historyToggleBtn = document.getElementById('historyToggleBtn'); // 新增
-            const historyPanel = document.getElementById('historyPanel'); // 新增
-            const historyList = document.getElementById('historyList'); // 新增
-            const clearHistoryBtn = document.getElementById('clearHistoryBtn'); // 新增
+            const shareButton = document.getElementById('shareButton'); 
+            const historyToggleBtn = document.getElementById('historyToggleBtn'); 
+            const historyPanel = document.getElementById('historyPanel'); 
+            const historyList = document.getElementById('historyList'); 
+            const clearHistoryBtn = document.getElementById('clearHistoryBtn'); 
 
             let typingInterval; // 用于控制打字机效果的计时器
 
@@ -209,14 +208,37 @@
                 history.forEach((item, index) => {
                     const listItem = document.createElement('li');
                     listItem.className = 'p-2 bg-gray-700 rounded-md flex justify-between items-center cursor-pointer hover:bg-gray-600 transition duration-200';
-                    listItem.innerHTML = `
-                        <div class="flex-grow min-w-0">
-                            <span class="font-semibold text-purple-300">${item.name}</span>: 
-                            <span class="font-bold text-white">${item.percentage}%</span>
-                            <p class="text-xs text-gray-400 mt-1 truncate">${item.message}</p>
-                        </div>
-                        <button class="recall-history text-purple-400 hover:text-purple-300 text-sm flex-shrink-0 whitespace-nowrap ml-2 px-3 py-1 rounded-md border border-purple-400 hover:bg-purple-700 transition duration-200" data-index="${index}">查看</button>
-                    `;
+
+                    // 使用 DOM API 而非 innerHTML，防止存储型 XSS
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'flex-grow min-w-0';
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'font-semibold text-purple-300';
+                    nameSpan.textContent = item.name; // textContent 自动转义
+
+                    const separator = document.createTextNode(': ');
+
+                    const percentSpan = document.createElement('span');
+                    percentSpan.className = 'font-bold text-white';
+                    percentSpan.textContent = item.percentage + '%';
+
+                    const messageP = document.createElement('p');
+                    messageP.className = 'text-xs text-gray-400 mt-1 truncate';
+                    messageP.textContent = item.message; // textContent 自动转义
+
+                    contentDiv.appendChild(nameSpan);
+                    contentDiv.appendChild(separator);
+                    contentDiv.appendChild(percentSpan);
+                    contentDiv.appendChild(messageP);
+
+                    const recallBtn = document.createElement('button');
+                    recallBtn.className = 'recall-history text-purple-400 hover:text-purple-300 text-sm flex-shrink-0 whitespace-nowrap ml-2 px-3 py-1 rounded-md border border-purple-400 hover:bg-purple-700 transition duration-200';
+                    recallBtn.dataset.index = index;
+                    recallBtn.textContent = '查看';
+
+                    listItem.appendChild(contentDiv);
+                    listItem.appendChild(recallBtn);
                     historyList.appendChild(listItem);
                 });
             }
